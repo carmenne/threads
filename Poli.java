@@ -16,7 +16,7 @@ class Submarine extends NavalShip {
 	}
 }
 
-class Test {
+class PoliTest {
 	public static void main(String[] args) {
 		NavalShip nv = new NavalShip();
 		((Submarine)nv).go();

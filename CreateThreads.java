@@ -11,6 +11,7 @@ public class CreateThreads {
 		
 		@Override
 		public void run() {
+			System.out.println(getUncaughtExceptionHandler());
 			System.out.println("MyThread running");
 		}
 	
@@ -54,37 +55,38 @@ public class CreateThreads {
 		
 		// Method3: Executors
 		ExecutorService executorService =
-				Executors.newSingleThreadExecutor();
+				Executors.newFixedThreadPool(1);
 		
 		Future future = executorService.submit(
-			() -> System.out.println("My executorService running")
+			() -> print("My executorService running")
 		);
 		
-		((Executor) executorService).execute(
-			() -> System.out.println("My executor running")
-		);
+		Future<String> myFuture = 
+			executorService.submit(() -> "my callable");
+			
+
+		try {
+			executorService.shutdown();
+		} catch (Throwable e) {
+			print("Could not shutdown");
+		}
+
 		
-		// Callable & Future (if return type instead of void is needed)
-		Callable<String> task = () -> "my callable";
-		
-		Future<String> myFuture = executorService.submit(task);
 		
 		try {
-			executorService.shutdownNow();
+			System.out.println("Hello, " + future.get());
 			System.out.println("Hello, " + myFuture.get());
-		} catch (InterruptedException e) {
-			System.out.println("I was interrupted");
-			throw new IllegalArgumentException();
-		} catch (ExecutionException e) {
-			System.out.println("ExecutionException");
-		} catch (Exception e) {
-			System.out.println("Exception");
-		}
-		
-		finally {
+		} catch (Throwable e) {			
+			print(e.getClass().getName());
+			print(e.getMessage());
+		} finally {
+			executorService.shutdownNow();
 			System.out.println("Shut down");
 		}
 		
+	}
+	private static void print(String s) {
+		System.out.println(s);
 	}
 	
 }
